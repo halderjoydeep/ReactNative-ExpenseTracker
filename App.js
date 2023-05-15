@@ -1,20 +1,97 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Provider } from 'react-redux';
 
-export default function App() {
+import store from './store';
+
+import {
+  AllExpensesScreen,
+  ManageExpenseScreen,
+  RecentExpensesScreen,
+} from './screens';
+import { GlobalStyles } from './constants/styles';
+
+const Stack = createNativeStackNavigator();
+const BottomTab = createBottomTabNavigator();
+
+function BottomTabComponent() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <BottomTab.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: GlobalStyles.colors.darkGreen },
+        headerTintColor: 'white',
+        headerTitleAlign: 'center',
+        headerShadowVisible: false,
+        tabBarStyle: {
+          backgroundColor: GlobalStyles.colors.darkGreen,
+          borderTopWidth: 0,
+        },
+        tabBarActiveTintColor: GlobalStyles.colors.lightGreen,
+        tabBarInactiveTintColor: 'white',
+      }}
+      sceneContainerStyle={{ backgroundColor: GlobalStyles.colors.darkGray }}
+    >
+      <BottomTab.Screen
+        name="RecentExpenses"
+        component={RecentExpensesScreen}
+        options={{
+          title: 'Recent Expenses',
+          tabBarLabel: 'Recent',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="time-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="AllExpenses"
+        component={AllExpensesScreen}
+        options={{
+          title: 'All Expenses',
+          tabBarLabel: 'All',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cash-outline" size={size} color={color} />
+          ),
+        }}
+      />
+    </BottomTab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <>
+      <StatusBar style="light" />
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerStyle: { backgroundColor: GlobalStyles.colors.darkGreen },
+              headerTintColor: 'white',
+              headerTitleAlign: 'center',
+              headerShadowVisible: false,
+              contentStyle: { backgroundColor: GlobalStyles.colors.darkGray },
+            }}
+          >
+            <Stack.Screen
+              name="BottomTab"
+              component={BottomTabComponent}
+              options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
+              name="ManageExpenseScreen"
+              component={ManageExpenseScreen}
+              options={{
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Provider>
+    </>
+  );
+}
